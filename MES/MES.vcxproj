@@ -140,12 +140,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="calka.cpp" />
+    <ClCompile Include="jakobian.cpp" />
     <ClCompile Include="kwadratury.cpp" />
     <ClCompile Include="gauss.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="grid.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="jakobian.h" />
     <ClInclude Include="kwadratury.h" />
     <ClInclude Include="gauss.h" />
     <ClInclude Include="grid.h" />

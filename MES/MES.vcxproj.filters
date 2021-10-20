@@ -30,6 +30,9 @@
     <ClCompile Include="grid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="jakobian.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="calka.h">
@@ -42,6 +45,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="kwadratury.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="jakobian.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
