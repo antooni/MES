@@ -28,30 +28,10 @@ int main()
 
 	std::cout << gauss->oblicz();*/
 
-	Element4* el = new Element4();
+	Element4* el = new Element4(TRZY_PUNKTOWY);
 
-	std::cout << "dKsi"  << std::endl;
-
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			std::cout << el->dKsi[i][j] << "   ";
-		}
-		std::cout << std::endl;
-	}
-
-	std::cout << std::endl;
-	std::cout << std::endl;
-	std::cout << std::endl;
-
-	std::cout << "dEta" << std::endl;
-
-
-	for (int i = 0; i < 4; i++) {
-		for (int j = 0; j < 4; j++) {
-			std::cout << el->dEta[i][j] << "   ";
-		}
-		std::cout << std::endl;
-	}
+	el->wyswietlDEta();
+	el->wyswietlDKsi();
 
 
 	

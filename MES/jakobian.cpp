@@ -1,4 +1,7 @@
 #include "jakobian.h"
+#include "calka.h"
+
+#include <iostream>
 
 double pKsi_1(double eta) {
 	return -0.25 * (1.0 - eta);
@@ -33,16 +36,32 @@ double pEta_4(double ksi) {
 }
 
 
-Element4::Element4()
+void Element4::wyswietlDKsi()
 {
-	dKsi = {
-		{},{},{},{}
-	};
+	std::cout << "dKsi" << std::endl;
+	for (int i = 0; i < dKsi.size(); i++) {
+		for (int j = 0; j < dKsi[i].size(); j++) {
+			std::cout << dKsi[i][j] << "\t";
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
+}
 
-	dEta = {
-		{},{},{},{}
-	};
+void Element4::wyswietlDEta()
+{
+	std::cout << "dEta" << std::endl;
+	for (int i = 0; i < dEta.size(); i++) {
+		for (int j = 0; j < dEta[i].size(); j++) {
+			std::cout << dEta[i][j] << "\t";
+		}
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
+}
 
+Element4::Element4(Schemat s)
+{
 	pochodneKsi = {
 		pKsi_1,
 		pKsi_2,
@@ -59,44 +78,47 @@ Element4::Element4()
 
 	kwadratura = new Kwadratura();
 
-	std::vector<PunktKwadratury*> punkty = kwadratura->stopnie[0]->punkty;
+	std::vector<PunktKwadratury*> punktyCalkowania;
 
+	if (s == DWU_PUNKTOWY) {
+		indeksyPunktow = {
+			new Point(0,0),
+			new Point(1,0),
+			new Point(1,1),
+			new Point(0,1),
+		};
 
-	for (int i = 0; i < pochodneKsi.size(); i++) {
-		dKsi[0].push_back(pochodneKsi[i](punkty[0]->x));
+		punktyCalkowania = kwadratura->stopnie[0]->punkty;
+	}
+	else if (s == TRZY_PUNKTOWY) {
+		indeksyPunktow = {
+			new Point(0,0),
+			new Point(0,1),
+			new Point(0,2),
+
+			new Point(1,0),
+			new Point(1,1),
+			new Point(1,2),
+
+			new Point(2,0),
+			new Point(2,1),
+			new Point(2,2),
+		};
+
+		punktyCalkowania = kwadratura->stopnie[1]->punkty;
 	}
 
-	for (int i = 0; i < pochodneKsi.size(); i++) {
-		dKsi[1].push_back(pochodneKsi[i](punkty[0]->x));
+
+	for (int i = 0; i < indeksyPunktow.size(); i++) {
+		std::vector<double> tempDKsi;
+		std::vector<double> tempDEta;
+
+		for (int j = 0; j < pochodneKsi.size(); j++) {
+			tempDKsi.push_back(pochodneKsi[j](punktyCalkowania[indeksyPunktow[i]->yIndex]->x));
+			tempDEta.push_back(pochodneEta[j](punktyCalkowania[indeksyPunktow[i]->xIndex]->x));
+		}
+
+		dKsi.push_back(tempDKsi);
+		dEta.push_back(tempDEta);
 	}
-
-	for (int i = 0; i < pochodneKsi.size(); i++) {
-		dKsi[2].push_back(pochodneKsi[i](punkty[1]->x));
-	}
-
-	for (int i = 0; i < pochodneKsi.size(); i++) {
-		dKsi[3].push_back(pochodneKsi[i](punkty[1]->x));
-	}
-
-
-
-
-
-
-	for (int i = 0; i < pochodneKsi.size(); i++) {
-		dEta[0].push_back(pochodneEta[i](punkty[0]->x));
-	}
-
-	for (int i = 0; i < pochodneKsi.size(); i++) {
-		dEta[1].push_back(pochodneEta[i](punkty[1]->x));
-	}
-
-	for (int i = 0; i < pochodneKsi.size(); i++) {
-		dEta[2].push_back(pochodneEta[i](punkty[1]->x));
-	}
-
-	for (int i = 0; i < pochodneKsi.size(); i++) {
-		dEta[3].push_back(pochodneEta[i](punkty[0]->x));
-	}
-	
 }
