@@ -28,12 +28,13 @@ int main()
 
 	std::cout << gauss->oblicz();*/
 
-	Element4* el = new Element4(TRZY_PUNKTOWY);
+	Element4* element = new Element4(DWU_PUNKTOWY);
 
-	el->wyswietlDEta();
-	el->wyswietlDKsi();
+	Grid* g = new Grid(0.025, 0.025, 2, 2);
 
-
+	Jakobian* j = new Jakobian(0, 0, *element, *g);
 	
+	double r1 = j->J_inv[0] * element->dKsi[0][0] + j->J_inv[1] * element->dKsi[0][1];
+
 	return 0;
 }

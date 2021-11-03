@@ -40,7 +40,7 @@ void Grid::homework()
 
 	std::cout << "=== ELEMENTY === [ID1,ID2,ID3,ID4] " << std::endl;
 	for (int i = 0; i  < nE; i++) {
-		std::cout << i+1 << ": [" << elements[i]->id[0] << " , " << elements[i]->id[1] << " , "  << elements[i]->id[2] << " , " << elements[i]->id[3] << "]" << std::endl;
+		std::cout << i+1 << ": [" << elements[i]->nodesID[0] << " , " << elements[i]->nodesID[1] << " , "  << elements[i]->nodesID[2] << " , " << elements[i]->nodesID[3] << "]" << std::endl;
 	}
 	std::cout << std::endl;
 
@@ -52,7 +52,7 @@ Node::Node(double _x, double _y) {
 }
 
 Element::Element(std::vector<int> _id) {
-	id = _id;
+	nodesID = _id;
 }
 
 

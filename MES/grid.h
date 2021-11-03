@@ -14,7 +14,7 @@ struct Node
 
 struct Element
 {
-	std::vector<int> id;
+	std::vector<int> nodesID;
 
 	Element(std::vector<int> _id);
 };
