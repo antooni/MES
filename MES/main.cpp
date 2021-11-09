@@ -5,6 +5,8 @@
 #include "calka.h"
 #include "gauss.h"
 #include "jakobian.h"
+#include "matrix.h"
+#include "H.h"
 
 double fun(double x) {
 	return 5 * x * x + 3 * x + 6;
@@ -19,22 +21,22 @@ Funkcja* funkcja2 = new Funkcja(fun2, "f(x) = 5x^2y^2 + 3xy + 6");
 
 int main()
 {
-	/*Schemat s = TRZY_PUNKTOWY;
-	Parametry* parametry = new Parametry(s);
+	//Schemat s = TRZY_PUNKTOWY;
+	//Parametry* parametry = new Parametry(s);
 
-	Calka* calka = new Calka(funkcja2, parametry);
+	//Calka* calka = new Calka(funkcja2, parametry);
 
-	Gauss* gauss = new Gauss(calka);
+	//Gauss* gauss = new Gauss(calka);
 
-	std::cout << gauss->oblicz();*/
+	//std::cout << gauss->oblicz();
 
-	Element4* element = new Element4(DWU_PUNKTOWY);
+	Pochodne* element = new Pochodne(DWU_PUNKTOWY);
 
 	Grid* g = new Grid(0.025, 0.025, 2, 2);
 
 	Jakobian* j = new Jakobian(0, 0, *element, *g);
-	
-	double r1 = j->J_inv[0] * element->dKsi[0][0] + j->J_inv[1] * element->dKsi[0][1];
+
+	H* h = new H(*j, *element, *g);
 
 	return 0;
 }

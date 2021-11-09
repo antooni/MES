@@ -36,7 +36,7 @@ double pEta_4(double ksi) {
 }
 
 
-void Element4::wyswietlDKsi()
+void Pochodne::wyswietlDKsi()
 {
 	std::cout << "dKsi" << std::endl;
 	for (int i = 0; i < dKsi.size(); i++) {
@@ -48,7 +48,7 @@ void Element4::wyswietlDKsi()
 	std::cout << std::endl;
 }
 
-void Element4::wyswietlDEta()
+void Pochodne::wyswietlDEta()
 {
 	std::cout << "dEta" << std::endl;
 	for (int i = 0; i < dEta.size(); i++) {
@@ -60,7 +60,7 @@ void Element4::wyswietlDEta()
 	std::cout << std::endl;
 }
 
-Element4::Element4(Schemat s)
+Pochodne::Pochodne(Schemat s)
 {
 	pochodneKsi = {
 		pKsi_1,
@@ -122,3 +122,43 @@ Element4::Element4(Schemat s)
 		dEta.push_back(tempDEta);
 	}
 }
+
+Jakobian::Jakobian(int i, int j, Pochodne element, Grid grid) {
+	double tmp = 0;
+
+	for (int k = 0; k < grid.elements[i]->nodesID.size(); k++) {
+		//double a = element.dKsi[j][k];
+		//double b = (grid.nodes[grid.elements[i]->nodesID[k] - 1]->x);
+
+		tmp += element.dKsi[j][k] * (grid.nodes[grid.elements[i]->nodesID[k] - 1.0]->x);
+	}
+	J.push_back(tmp);
+
+	tmp = 0;
+	for (int k = 0; k < grid.elements[i]->nodesID.size(); k++) {
+		tmp += element.dKsi[j][k] * (grid.nodes[grid.elements[i]->nodesID[k] - 1.0]->y);
+	}
+	J.push_back(tmp);
+
+	tmp = 0;
+	for (int k = 0; k < grid.elements[i]->nodesID.size(); k++) {
+		tmp += element.dEta[j][k] * (grid.nodes[grid.elements[i]->nodesID[k] - 1.0]->x);
+	}
+	J.push_back(tmp);
+
+	tmp = 0;
+	for (int k = 0; k < grid.elements[i]->nodesID.size(); k++) {
+		tmp += element.dEta[j][k] * (grid.nodes[grid.elements[i]->nodesID[k] - 1.0]->y);
+	}
+	J.push_back(tmp);
+
+	double detJ = (J[0] * J[3]) - (J[2] * J[3]);
+	det = detJ;
+	detJ = 1.0 / detJ;
+
+	J_inv.push_back(detJ * J[3]);
+	J_inv.push_back(-detJ * (J[1]));
+	J_inv.push_back(-detJ * (J[2]));
+	J_inv.push_back(detJ * J[0]);
+}
+

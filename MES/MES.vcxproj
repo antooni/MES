@@ -140,18 +140,22 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="calka.cpp" />
+    <ClCompile Include="H.cpp" />
     <ClCompile Include="jakobian.cpp" />
     <ClCompile Include="kwadratury.cpp" />
     <ClCompile Include="gauss.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="grid.cpp" />
+    <ClCompile Include="matrix.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="H.h" />
     <ClInclude Include="jakobian.h" />
     <ClInclude Include="kwadratury.h" />
     <ClInclude Include="gauss.h" />
     <ClInclude Include="grid.h" />
     <ClInclude Include="calka.h" />
+    <ClInclude Include="matrix.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
