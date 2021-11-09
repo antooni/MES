@@ -17,7 +17,7 @@ H::H(Jakobian jakobian, Pochodne element, Grid grid) {
 		}
 	}
 
-	Matrix** HH = new Matrix * [m]();
+	Matrix** HH = new Matrix* [m]();
 
 	for (int k = 0; k < m; k++) {
 		HH[k] = new Matrix(n, m, 0.0);

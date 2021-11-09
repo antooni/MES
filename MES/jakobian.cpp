@@ -152,7 +152,7 @@ Jakobian::Jakobian(int i, int j, Pochodne element, Grid grid) {
 	}
 	J.push_back(tmp);
 
-	double detJ = (J[0] * J[3]) - (J[2] * J[3]);
+	double detJ = (J[0] * J[3]) - (J[1] * J[2]);
 	det = detJ;
 	detJ = 1.0 / detJ;
 

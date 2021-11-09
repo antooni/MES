@@ -32,11 +32,22 @@ int main()
 
 	Pochodne* element = new Pochodne(DWU_PUNKTOWY);
 
-	Grid* g = new Grid(0.025, 0.025, 2, 2);
+	Grid* g = new Grid(0.2, 0.1, 5, 4);
+	//Grid* g = new Grid(0.025, 0.025, 2, 2);
 
-	Jakobian* j = new Jakobian(0, 0, *element, *g);
+	g->homework();
 
-	H* h = new H(*j, *element, *g);
+	for (int i = 0; i < g->elements.size(); i++) {
+		if (i == 8) {
+			std::cout << "";
+		}
+		Jakobian* j = new Jakobian(0, 0, *element, *g);
+		H* h = new H(*j, *element, *g);
+	}
+
+
+
+
 
 	return 0;
 }

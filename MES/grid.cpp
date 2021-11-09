@@ -19,7 +19,7 @@ Grid::Grid(double _H, double _B, int _nH, int _nB)
 	}
 
 	for (int i = 1; i <= nE; i++) {
-		int offset = i / nH;
+		int offset = i / (nH-1);
 
 		std::vector<int> ids = { i + offset,i + nH + offset,i + nH + 1 + offset, i + 1 + offset };
 
