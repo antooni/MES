@@ -27,18 +27,19 @@ struct Point {
 	}
 };
 
-struct Pochodne {
+struct Element4 {
 	std::vector<std::vector<double>> dKsi;
 	std::vector<std::vector<double>> dEta;
 
 	std::vector<double(*)(double)> pochodneKsi;
 	std::vector<double(*)(double)> pochodneEta;
+	std::vector<double(*)(double, double)> N;
 
 	std::vector<IndexPoint*> indeksyPunktow;
 
 	Kwadratura* kwadratura;
 
-	Pochodne(Schemat s);
+	Element4(Schemat s);
 
 	void wyswietlDKsi();
 	void wyswietlDEta();
@@ -52,6 +53,6 @@ struct Jakobian {
 
 	double det;
 
-	Jakobian(int i, int j, Pochodne element, Grid grid);
+	Jakobian(int i, int j, Element4 element, Grid grid);
 };
 

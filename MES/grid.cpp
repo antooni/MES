@@ -14,14 +14,19 @@ Grid::Grid(double _H, double _B, int _nH, int _nB)
 
 	for (double i = 0.0; i < nB; i++) {
 		for (double ii = 0.0; ii < nH; ii++) {
-			nodes.push_back(new Node(i * deltaX, ii * deltaY));
+			bool isBC = false;
+			if (i == 0.0 || i == (nB-1)) isBC = true;
+			if (ii == 0.0 || ii == (nH - 1)) isBC = true;
+			nodes.push_back(new Node(i * deltaX, ii * deltaY, isBC));
 		}
 	}
-
+	int offset = 0;
 	for (int i = 1; i <= nE; i++) {
-		int offset = i / (nH-1);
+		//int offset = i / (nH-1);
 
 		std::vector<int> ids = { i + offset,i + nH + offset,i + nH + 1 + offset, i + 1 + offset };
+		if (i != 0 && (i % (nH - 1) == 0)) offset++;
+
 
 		elements.push_back(new Element(ids));
 	}
@@ -34,7 +39,7 @@ void Grid::homework()
 
 	std::cout << "=== WEZLY === (x,y)" << std::endl;
 	for (int i = 0; i < nN; i++) {
-		std::cout << i+1 << ": (" << nodes[i]->x << " , " << nodes[i]->y <<")"<<std::endl;
+		std::cout << i+1 << ": (" << nodes[i]->x << " , " << nodes[i]->y <<") | isBC? " << nodes[i]->isBC<<std::endl;
 	}
 	std::cout << std::endl;
 
@@ -46,9 +51,10 @@ void Grid::homework()
 
 }
 
-Node::Node(double _x, double _y) {
+Node::Node(double _x, double _y, bool _isBC) {
 	x = _x;
 	y = _y;
+	isBC = _isBC;
 }
 
 Element::Element(std::vector<int> _id) {

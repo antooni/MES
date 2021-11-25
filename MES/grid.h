@@ -8,8 +8,9 @@ struct Node
 {
 	double x;
 	double y;
+	bool isBC;
 
-	Node(double _x, double _y);
+	Node(double _x, double _y, bool isBC);
 };
 
 struct Element

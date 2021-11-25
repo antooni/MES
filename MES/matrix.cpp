@@ -53,3 +53,21 @@ Matrix* Matrix::getTransposed()
 
 	return T;
 }
+
+Matrix Matrix::add(Matrix* m1)
+{
+	Matrix* result = new Matrix(n, m, 0.0);
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < m; j++) {
+			result->a[i][j] = a[i][j] + m1->a[i][j];
+		}
+	}
+
+	return *result;
+}
+
+
+
+
+

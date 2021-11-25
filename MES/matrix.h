@@ -12,4 +12,6 @@ struct Matrix {
 	void print();
 
 	Matrix* getTransposed();
+
+	Matrix add(Matrix* m1);
 };

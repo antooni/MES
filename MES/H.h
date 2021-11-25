@@ -9,5 +9,19 @@
 struct H {
 	Matrix* macierz;
 
-	H(Jakobian jakobian, Pochodne element, Grid grid);
+	H(int nrElementu, Element4 element, Grid grid);
+};
+
+struct Hbc {
+	Matrix* macierz;
+
+	Hbc(int nrElementu, Element4 element, Grid grid);
+
+};
+
+enum Walls {
+	BOTTOM,
+	RIGHT,
+	TOP,
+	LEFT,
 };

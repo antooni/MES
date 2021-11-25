@@ -8,6 +8,7 @@
 #include "matrix.h"
 #include "H.h"
 
+
 double fun(double x) {
 	return 5 * x * x + 3 * x + 6;
 }
@@ -30,20 +31,40 @@ int main()
 
 	//std::cout << gauss->oblicz();
 
-	Pochodne* element = new Pochodne(DWU_PUNKTOWY);
+	Element4* element = new Element4(DWU_PUNKTOWY);
 
-	Grid* g = new Grid(0.2, 0.1, 5, 4);
+	//Grid* g = new Grid(0.2, 0.1, 5, 4);
+
 	//Grid* g = new Grid(0.025, 0.025, 2, 2);
+	Grid* g = new Grid(0.1, 0.1, 4, 4);
+	
+	
+	//Grid* g = new Grid(0.025, 0.025, 6, 2);
+
+
 
 	g->homework();
 
-	for (int i = 0; i < g->elements.size(); i++) {
-		if (i == 8) {
-			std::cout << "";
+	Hbc* hbc = new Hbc(0, *element, *g);
+
+
+	Matrix* HEX = new Matrix(16, 16, 0.0);
+
+	for (int nrElementu = 0; nrElementu < g->elements.size(); nrElementu++) {
+		H* h = new H(nrElementu, *element, *g);
+		Hbc* hbc = new Hbc(nrElementu, *element, *g);
+
+		Matrix res = h->macierz->add(hbc->macierz);
+
+		for (int i = 0; i < 4; i++) {
+			for (int j = 0; j < 4; j++) {
+				HEX->a[g->elements[nrElementu]->nodesID[i] - 1][g->elements[nrElementu]->nodesID[j] - 1] += h->macierz->a[i][j];
+			}
 		}
-		Jakobian* j = new Jakobian(0, 0, *element, *g);
-		H* h = new H(*j, *element, *g);
+
 	}
+
+	HEX->print();
 
 
 

@@ -35,8 +35,24 @@ double pEta_4(double ksi) {
 	return 0.25 * (1.0 - ksi);
 }
 
+double n1(double ksi, double eta) {
+	return 0.25 * (1 - ksi) * (1 - eta);
+}
 
-void Pochodne::wyswietlDKsi()
+double n2(double ksi, double eta) {
+	return 0.25 * (1 + ksi) * (1 - eta);
+}
+
+double n3(double ksi, double eta) {
+	return 0.25 * (1 + ksi) * (1 + eta);
+}
+
+double n4(double ksi, double eta) {
+	return 0.25 * (1 - ksi) * (1 + eta);
+}
+
+
+void Element4::wyswietlDKsi()
 {
 	std::cout << "dKsi" << std::endl;
 	for (int i = 0; i < dKsi.size(); i++) {
@@ -48,7 +64,7 @@ void Pochodne::wyswietlDKsi()
 	std::cout << std::endl;
 }
 
-void Pochodne::wyswietlDEta()
+void Element4::wyswietlDEta()
 {
 	std::cout << "dEta" << std::endl;
 	for (int i = 0; i < dEta.size(); i++) {
@@ -60,7 +76,7 @@ void Pochodne::wyswietlDEta()
 	std::cout << std::endl;
 }
 
-Pochodne::Pochodne(Schemat s)
+Element4::Element4(Schemat s)
 {
 	pochodneKsi = {
 		pKsi_1,
@@ -74,6 +90,13 @@ Pochodne::Pochodne(Schemat s)
 		pEta_2,
 		pEta_3,
 		pEta_4,
+	};
+
+	N = {
+		n1,
+		n2,
+		n3,
+		n4,
 	};
 
 	kwadratura = new Kwadratura();
@@ -123,12 +146,16 @@ Pochodne::Pochodne(Schemat s)
 	}
 }
 
-Jakobian::Jakobian(int i, int j, Pochodne element, Grid grid) {
+
+//i = element
+//j = punkt calkowania
+// jakobian wyliczam dla kazdego punktu calkowania
+Jakobian::Jakobian(int i, int j, Element4 element, Grid grid) {
 	double tmp = 0;
 
 	for (int k = 0; k < grid.elements[i]->nodesID.size(); k++) {
-		//double a = element.dKsi[j][k];
-		//double b = (grid.nodes[grid.elements[i]->nodesID[k] - 1]->x);
+		double a = element.dKsi[j][k];
+		double b = (grid.nodes[grid.elements[i]->nodesID[k] - 1]->x);
 
 		tmp += element.dKsi[j][k] * (grid.nodes[grid.elements[i]->nodesID[k] - 1.0]->x);
 	}
