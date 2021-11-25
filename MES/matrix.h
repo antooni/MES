@@ -1,13 +1,13 @@
 #pragma once
 
 struct Matrix {
-	double** a;
-	int n;
-	int m;
+	double** A;
+	int nKolumn;
+	int mRzedow;
 
 	Matrix();
-	Matrix(int _n, int _m, double** _a);
-	Matrix(int _n, int _m, double value);
+	Matrix(int _nKolumn, int _mRzedow, double** _A);
+	Matrix(int _nKolumn, int _mRzedow, double value);
 
 	void print();
 

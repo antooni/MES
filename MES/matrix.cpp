@@ -4,28 +4,28 @@
 
 Matrix::Matrix()
 {
-	n = NULL;
-	m = NULL;
-	a = NULL;
+	nKolumn = NULL;
+	mRzedow = NULL;
+	A = NULL;
 }
 
-Matrix::Matrix(int _n, int _m, double** _a)
+Matrix::Matrix(int _nKolumn, int _mRzedow, double** _a)
 {
-	n = _n;
-	m = _m;
-	a = _a;
+	nKolumn = _nKolumn;
+	mRzedow = _mRzedow;
+	A = _a;
 }
 
-Matrix::Matrix(int _n, int _m, double value)
+Matrix::Matrix(int _nKolumn, int _mRzedow, double value)
 {
-	n = _n;
-	m = _m;
+	nKolumn = _nKolumn;
+	mRzedow = _mRzedow;
 
-	a = new double* [m];
-	for (int i = 0; i < m; i++) {
-		a[i] = new double[n];
-		for (int j = 0; j < n; j++) {
-			a[i][j] = value;
+	A = new double* [mRzedow];
+	for (int i = 0; i < mRzedow; i++) {
+		A[i] = new double[nKolumn];
+		for (int j = 0; j < nKolumn; j++) {
+			A[i][j] = value;
 		}
 	}
 }
@@ -33,9 +33,9 @@ Matrix::Matrix(int _n, int _m, double value)
 void Matrix::print()
 {
 	std::cout << std::endl;
-	for (int i = 0; i < m; i++) {
-		for (int j = 0; j < n; j++) {
-			std::cout << a[i][j] << " ";
+	for (int i = 0; i < mRzedow; i++) {
+		for (int j = 0; j < nKolumn; j++) {
+			std::cout << A[i][j] << " ";
 		}
 		std::cout << std::endl;
 	}
@@ -43,11 +43,11 @@ void Matrix::print()
 
 Matrix* Matrix::getTransposed()
 {
-	Matrix* T = new Matrix(m,n,0.0);
+	Matrix* T = new Matrix(mRzedow,nKolumn,0.0);
 
-	for (int i = 0; i < m; i++) {
-		for (int j = 0; j < n; j++) {
-			T->a[j][i] = a[i][j];
+	for (int i = 0; i < mRzedow; i++) {
+		for (int j = 0; j < nKolumn; j++) {
+			T->A[j][i] = A[i][j];
 		}
 	}
 
@@ -56,11 +56,11 @@ Matrix* Matrix::getTransposed()
 
 Matrix Matrix::add(Matrix* m1)
 {
-	Matrix* result = new Matrix(n, m, 0.0);
+	Matrix* result = new Matrix(mRzedow, nKolumn, 0.0);
 
-	for (int i = 0; i < n; i++) {
-		for (int j = 0; j < m; j++) {
-			result->a[i][j] = a[i][j] + m1->a[i][j];
+	for (int i = 0; i < mRzedow; i++) {
+		for (int j = 0; j < nKolumn; j++) {
+			result->A[i][j] = A[i][j] + m1->A[i][j];
 		}
 	}
 

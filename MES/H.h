@@ -19,6 +19,12 @@ struct Hbc {
 
 };
 
+struct P {
+	Matrix* macierz;
+
+	P(int nrElementu, Element4 element, Grid grid);
+};
+
 enum Walls {
 	BOTTOM,
 	RIGHT,
