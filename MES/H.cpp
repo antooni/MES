@@ -198,7 +198,7 @@ P::P(int nrElementu, Element4 element, Grid grid)
 	int n = element.N.size();
 	int m = element.indeksyPunktow.size();
 
-	Matrix* P = new Matrix( 1, grid.nodes.size(), 0.0);
+	Matrix* P = new Matrix( 1, 4, 0.0);
 
 	for (int nrSciany = 0; nrSciany < walls.size(); nrSciany++) {
 
