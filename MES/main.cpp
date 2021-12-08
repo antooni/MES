@@ -18,7 +18,7 @@ double fun2(double x, double y) {return 5 * x * x * y * y + 3 * x * y + 6;}
 Funkcja* funkcja = new Funkcja(fun, "f(x) = 5x^2 + 3x + 6");
 Funkcja* funkcja2 = new Funkcja(fun2, "f(x) = 5x^2y^2 + 3xy + 6");
 
-bool gauss(int n, double** AB, double* X);
+Matrix* gauss(Matrix* A, Matrix* B);
 
 
 int main()
@@ -43,6 +43,7 @@ int main()
 
 		Matrix res = h->macierz->add(hbc->macierz);
 
+
 		for (int i = 0; i < res.mRzedow; i++) {
 			for (int j = 0; j < res.nKolumn; j++) {
 				HEX->A[g->elements[nrElementu]->nodesID[i] - 1][g->elements[nrElementu]->nodesID[j] - 1] += res.A[i][j];
@@ -61,54 +62,108 @@ int main()
 
 	}
 
-	Matrix* AB = new Matrix(ILOSC_WEZLOW + 1, ILOSC_WEZLOW, 0.0);
+	Matrix* RES = new Matrix(ILOSC_WEZLOW, ILOSC_WEZLOW, 0.0);
 
-	for (int i = 0; i < AB->nKolumn; i++) {
-		for (int j = 0; j < AB->mRzedow; j++) {
-			if (i == 16) AB->A[j][i] = PEX->A[j][0];
-			else AB->A[i][j] = HEX->A[i][j];
+	for(int i = 0; i < ILOSC_WEZLOW; i++)
+		for (int j = 0; j < ILOSC_WEZLOW; j++) {
+			
+			RES->A[i][j] = HEX->A[i][j] + (CEX->A[i][j] / 50.0);
 		}
-	}
-	AB->print();
 
-	double* X = new double[ILOSC_WEZLOW];
-	if (gauss(ILOSC_WEZLOW, AB->A, X))
-	{
-		for (int i = 0; i < ILOSC_WEZLOW; i++)
-			std::cout << "x" << i + 1 << " = "  << X[i]
-			<< std::endl;
-	}
-	else
-		std::cout << "DZIELNIK ZERO\n";
+	RES->print();
 
-	CEX->print();
+
+	Matrix* PES = new Matrix(1, ILOSC_WEZLOW, 0.0);
+
+	for (int i = 0; i < ILOSC_WEZLOW; i++)
+		for (int j = 0; j < ILOSC_WEZLOW; j++) {
+			double a = g->nodes[j]->t0;
+			double b = (CEX->A[i][j] / 50.0);
+			double c = HEX->A[i][j] + (CEX->A[i][j] / 50.0);
+			PES->A[i][0] += g->nodes[j]->t0 * (CEX->A[i][j] / 50.0);
+		}
+
+	for (int i = 0; i < ILOSC_WEZLOW; i++) {
+		PES->A[i][0] += PEX->A[i][0];
+	}
+
+	PES->print();
+
+	gauss(RES, PES)->print();
+
+
+	//CEX->print();
+
+
+	//Matrix* AB = new Matrix(ILOSC_WEZLOW + 1, ILOSC_WEZLOW, 0.0);
+
+	//for (int i = 0; i < AB->nKolumn; i++) {
+	//	for (int j = 0; j < AB->mRzedow; j++) {
+	//		if (i == 16) AB->A[j][i] = PEX->A[j][0];
+	//		else AB->A[i][j] = HEX->A[i][j];
+	//	}
+	//}
+	//AB->print();
+
+	//double* X = new double[ILOSC_WEZLOW];
+	//if (gauss(ILOSC_WEZLOW, AB->A, X))
+	//{
+	//	for (int i = 0; i < ILOSC_WEZLOW; i++)
+	//		std::cout << "x" << i + 1 << " = "  << X[i]
+	//		<< std::endl;
+	//}
+	//else
+	//	std::cout << "DZIELNIK ZERO\n";
+
 
 	return 0;
 }
 
-bool gauss(int n, double** AB, double* X)
+Matrix* gauss( Matrix* A, Matrix* B)
 {
+	int n = A->nKolumn;
+
+	Matrix* AB = new Matrix(A->nKolumn+1, A->mRzedow, 0.0);
+
+	for (int i = 0; i < AB->nKolumn; i++) {
+		for (int j = 0; j < AB->mRzedow; j++) {
+			if (i == 16) AB->A[j][i] = B->A[j][0];
+			else AB->A[i][j] = A->A[i][j];
+		}
+	}
+	AB->print();
+
+
 	int i, j, k;
 	double m, s;
+
+	Matrix* X = new Matrix(1, A->nKolumn, 0.0);
 
 	for (i = 0; i < n - 1; i++)
 	{
 		for (j = i + 1; j < n; j++)
 		{
-			if (fabs(AB[i][i]) < eps) return false;
-			m = -AB[j][i] / AB[i][i];
+			if (fabs(AB->A[i][i]) < eps) {
+				std::cout << "DZIELNIK ZERO W GAUSS" << std::endl;
+				return new Matrix(1, 1, 0.0);
+			}
+			m = -AB->A[j][i] / AB->A[i][i];
 			for (k = i + 1; k <= n; k++)
-				AB[j][k] += m * AB[i][k];
+				AB->A[j][k] += m * AB->A[i][k];
 		}
 	}
 
 	for (i = n - 1; i >= 0; i--)
 	{
-		s = AB[i][n];
+		s = AB->A[i][n];
 		for (j = n - 1; j >= i + 1; j--)
-			s -= AB[i][j] * X[j];
-		if (fabs(AB[i][i]) < eps) return false;
-		X[i] = s / AB[i][i];
+			s -= AB->A[i][j] * X->A[j][0];
+		if (fabs(AB->A[i][i]) < eps) {
+			std::cout << "DZIELNIK ZERO W GAUSS" << std::endl;
+			return new Matrix(1, 1, 0.0);
+		}
+		X->A[i][0] = s / AB->A[i][i];
 	}
-	return true;
+
+	return X;
 }

@@ -15,8 +15,6 @@ C::C(int nrElementu, Element4 element, Grid grid)
 		}
 	}
 
-	double detJ = 0.00015625;
-
 	for (int k = 0; k < 4; k++) {
 
 		for (int i = 0; i < 4; i++) {

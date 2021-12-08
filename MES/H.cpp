@@ -1,7 +1,9 @@
 #include "H.h"
 #include "jakobian.h"
 
-constexpr auto CONDUCTIVITY = 25;
+constexpr auto CONDUCTIVITY = 25.0;
+constexpr auto ALFA = 300.0;
+
 
 
 
@@ -136,22 +138,17 @@ Hbc::Hbc(int nrElementu, Element4 element, Grid grid)
 
 		double detJ = L / 2;
 
-		//Matrix* czerwony = new Matrix(4, 4, 0.0);
-
 		for (int i = 0; i < 4; i++) {
 			for (int j = 0; j < 4; j++) {
 				double a = nValue->A[0][i] * nValue->A[0][j];
 
 				double c = nValue->A[1][i] * nValue->A[1][j];
 
-				//czerwony->a[i][j] = (25 * a + 25 * c) * detJ;
-				HBC->A[i][j] += (25 * a + 25 * c) * detJ;
+				HBC->A[i][j] += (ALFA * a + ALFA* c) * detJ;
 			}
 		}
-		//czerwony->print();
 	}
 	macierz = HBC;
-	//macierz->print();
 }
 
 P::P(int nrElementu, Element4 element, Grid grid)
@@ -185,7 +182,6 @@ P::P(int nrElementu, Element4 element, Grid grid)
 		}
 		Node* tmpNode2 = grid.nodes[tmpNodeID2];
 
-		//works only for 2d
 		if (tmpNode->isBC && tmpNode2->isBC) {
 			if (i == 0) walls.push_back(BOTTOM);
 			if (i == 1) walls.push_back(RIGHT);
@@ -248,10 +244,9 @@ P::P(int nrElementu, Element4 element, Grid grid)
 
 			double c = nValue->A[1][j] * T[walls[nrSciany]];
 
-			P->A[j][0] += (25 * a + 25 * c) * detJ;
+			P->A[j][0] += (ALFA * a + ALFA * c) * detJ;
 		}
 	}
 
 	macierz = P;
-	//macierz->print();
 }

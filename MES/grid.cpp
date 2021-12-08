@@ -1,5 +1,7 @@
 #include "grid.h"
 
+constexpr auto T0 = 100.0;
+
 Grid::Grid(double _H, double _B, int _nH, int _nB)
 {
 	H = _H;
@@ -17,7 +19,7 @@ Grid::Grid(double _H, double _B, int _nH, int _nB)
 			bool isBC = false;
 			if (i == 0.0 || i == (nB-1)) isBC = true;
 			if (ii == 0.0 || ii == (nH - 1)) isBC = true;
-			nodes.push_back(new Node(i * deltaX, ii * deltaY, isBC));
+			nodes.push_back(new Node(i * deltaX, ii * deltaY, isBC, T0));
 		}
 	}
 	int offset = 0;
@@ -51,10 +53,11 @@ void Grid::homework()
 
 }
 
-Node::Node(double _x, double _y, bool _isBC) {
+Node::Node(double _x, double _y, bool _isBC, double _t0) {
 	x = _x;
 	y = _y;
 	isBC = _isBC;
+	t0 = _t0;
 }
 
 Element::Element(std::vector<int> _id) {
