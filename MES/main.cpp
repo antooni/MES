@@ -1,4 +1,6 @@
 #include <iostream>
+#include <chrono>
+
 
 #include "grid.h"
 #include "kwadratury.h"
@@ -8,6 +10,9 @@
 #include "matrix.h"
 #include "H.h"
 #include "C.h"
+
+using namespace std::chrono;
+
 
 const double eps = 1e-12;
 
@@ -33,9 +38,7 @@ int main()
 
 	const int ILOSC_WEZLOW = g->nodes.size();
 	
-
-
-	for (double iteracja = 0.0; iteracja < 2.0; iteracja += 1.0) {
+	for (int iteracja = 0; iteracja < 10; iteracja++) {
 		Matrix* HEX = new Matrix(ILOSC_WEZLOW, ILOSC_WEZLOW, 0.0);
 		Matrix* CEX = new Matrix(ILOSC_WEZLOW, ILOSC_WEZLOW, 0.0);
 		Matrix* PEX = new Matrix(1, ILOSC_WEZLOW, 0.0);
@@ -46,17 +49,16 @@ int main()
 			P* p = new P(nrElementu, *element, *g);
 			C* c = new C(nrElementu, *element, *g);
 
-			Matrix res = h->macierz->add(hbc->macierz);
+			Matrix* res = h->macierz->add(hbc->macierz);
 
-
-			for (int i = 0; i < res.mRzedow; i++) {
-				for (int j = 0; j < res.nKolumn; j++) {
-					HEX->A[g->elements[nrElementu]->nodesID[i] - 1][g->elements[nrElementu]->nodesID[j] - 1] += res.A[i][j];
+			for (int i = 0; i < res->mRzedow; i++) {
+				for (int j = 0; j < res->nKolumn; j++) {
+					HEX->A[g->elements[nrElementu]->nodesID[i] - 1][g->elements[nrElementu]->nodesID[j] - 1] += res->A[i][j];
 				}
 			}
 
-			for (int i = 0; i < res.mRzedow; i++) {
-				for (int j = 0; j < res.nKolumn; j++) {
+			for (int i = 0; i < res->mRzedow; i++) {
+				for (int j = 0; j < res->nKolumn; j++) {
 					CEX->A[g->elements[nrElementu]->nodesID[i] - 1][g->elements[nrElementu]->nodesID[j] - 1] += c->macierz->A[i][j];
 				}
 			}
@@ -65,6 +67,10 @@ int main()
 				PEX->A[g->elements[nrElementu]->nodesID[j] - 1][0] += p->macierz->A[j][0];
 			}
 
+			delete h;
+			delete hbc;
+			delete p;
+			delete c;
 		}
 
 		Matrix* RES = new Matrix(ILOSC_WEZLOW, ILOSC_WEZLOW, 0.0);
@@ -76,6 +82,7 @@ int main()
 			}
 
 		//RES->print();
+
 
 		Matrix* PES = new Matrix(1, ILOSC_WEZLOW, 0.0);
 
@@ -91,22 +98,22 @@ int main()
 			PES->A[i][0] += PEX->A[i][0];
 		}
 
-		//PES->print();
-		std::cout << "ITERACJA " << iteracja << std::endl;
 		Matrix* X = gauss(RES, PES);
-		X->print();
+		std::cout << iteracja << " : " << X->min() << " " << X->max()<< std::endl;
 
 		for (int i = 0; i < ILOSC_WEZLOW; i++) {
 			double a = X->A[i][0];
 			g->nodes[i]->t0 = X->A[i][0];
 		}
 
+
+		delete HEX;
+		delete CEX;
+		delete PEX;
+		delete RES;
+		delete PES;
+		delete X;
 	}
-
-	//for (int i = 0; i < ILOSC_WEZLOW; i++) {
-	//	std::cout << g->nodes[i]->t0 << std::endl;
-	//}
-
 
 	return 0;
 }
@@ -154,6 +161,8 @@ Matrix* gauss( Matrix* A, Matrix* B)
 		}
 		X->A[i][0] = s / AB->A[i][i];
 	}
+
+	delete AB;
 
 	return X;
 }

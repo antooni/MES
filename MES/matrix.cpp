@@ -9,6 +9,11 @@ Matrix::Matrix()
 	A = NULL;
 }
 
+Matrix::~Matrix()
+{
+	delete A;
+}
+
 Matrix::Matrix(int _nKolumn, int _mRzedow, double** _a)
 {
 	nKolumn = _nKolumn;
@@ -54,7 +59,7 @@ Matrix* Matrix::getTransposed()
 	return T;
 }
 
-Matrix Matrix::add(Matrix* m1)
+Matrix* Matrix::add(Matrix* m1)
 {
 	Matrix* result = new Matrix(mRzedow, nKolumn, 0.0);
 
@@ -64,7 +69,32 @@ Matrix Matrix::add(Matrix* m1)
 		}
 	}
 
-	return *result;
+	return result;
+}
+
+double Matrix::min()
+{
+	double min = INT_MAX;
+
+	for (int i = 0; i < mRzedow; i++) {
+		for (int j = 0; j < nKolumn; j++) {
+			if (A[i][j] < min) min = A[i][j];
+		}
+	}
+
+	return min;
+}
+
+double Matrix::max()
+{
+	double max = INT_MIN;
+
+	for (int i = 0; i < mRzedow; i++) {
+		for (int j = 0; j < nKolumn; j++) {
+			if (A[i][j] > max) max= A[i][j];
+		}
+	}
+	return max;
 }
 
 

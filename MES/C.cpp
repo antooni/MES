@@ -1,26 +1,38 @@
 #include "C.h"
 
+#include <chrono>
+
+using namespace std::chrono;
+
 C::C(int nrElementu, Element4 element, Grid grid)
 {
 	Matrix* C = new Matrix(4, 4, 0.0);
 
 	Matrix* N = new Matrix(4, 4, 0.0);
 
-	for (int i = 0; i < 4; i++) {
-		double ksi = element.kwadratura->stopnie[0]->punkty[element.indeksyPunktow[i]->xIndex]->x;
-		double eta = element.kwadratura->stopnie[0]->punkty[element.indeksyPunktow[i]->yIndex]->x;
-		for (int j = 0; j < 4; j++) {
-			double nvalue = element.N[j](ksi, eta);
-			N->A[i][j] = nvalue;
-		}
-	}
+	//for (int i = 0; i < 4; i++) {
+	//	double ksi = element.kwadratura->stopnie[0]->punkty[element.indeksyPunktow[i]->xIndex]->x;
+	//	double eta = element.kwadratura->stopnie[0]->punkty[element.indeksyPunktow[i]->yIndex]->x;
+	//	for (int j = 0; j < 4; j++) {
+	//		double nvalue = element.N[j](ksi, eta);
+	//		N->A[i][j] = nvalue;
+	//	}
+	//}
 
 	for (int k = 0; k < 4; k++) {
+		Jakobian* jakobian = new Jakobian(nrElementu, k, element, grid);
+
 
 		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
+			double ksi = element.kwadratura->stopnie[0]->punkty[element.indeksyPunktow[i]->xIndex]->x;
+			double eta = element.kwadratura->stopnie[0]->punkty[element.indeksyPunktow[i]->yIndex]->x;
 
-				Jakobian* jakobian = new Jakobian(nrElementu, j, element, grid);
+
+			for (int j = 0; j < 4; j++) {
+				double nvalue = element.N[j](ksi, eta);
+				N->A[i][j] = nvalue;
+
+
 				double n1 = N->A[k][i];
 				double n2 = N->A[k][j];
 
@@ -30,6 +42,9 @@ C::C(int nrElementu, Element4 element, Grid grid)
 				C->A[i][j] += 700.0 * 7800.0 * a * jakobian->det;
 			}
 		}
+		delete jakobian;
 	}
+
+	delete N;
 	macierz = C;
 }

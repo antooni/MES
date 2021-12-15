@@ -6,6 +6,7 @@ struct Matrix {
 	int mRzedow;
 
 	Matrix();
+	~Matrix();
 	Matrix(int _nKolumn, int _mRzedow, double** _A);
 	Matrix(int _nKolumn, int _mRzedow, double value);
 
@@ -13,5 +14,7 @@ struct Matrix {
 
 	Matrix* getTransposed();
 
-	Matrix add(Matrix* m1);
+	Matrix* add(Matrix* m1);
+	double min();
+	double max();
 };

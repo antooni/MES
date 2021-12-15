@@ -153,39 +153,45 @@ Element4::Element4(Schemat s)
 Jakobian::Jakobian(int i, int j, Element4 element, Grid grid) {
 	double tmp = 0;
 
+	J = new double[4];
+	J_inv = new double[4];
+
 	for (int k = 0; k < grid.elements[i]->nodesID.size(); k++) {
 		double a = element.dKsi[j][k];
 		double b = (grid.nodes[grid.elements[i]->nodesID[k] - 1]->x);
 
 		tmp += element.dKsi[j][k] * (grid.nodes[grid.elements[i]->nodesID[k] - 1.0]->x);
 	}
-	J.push_back(tmp);
+	J[0]=tmp;
 
 	tmp = 0;
 	for (int k = 0; k < grid.elements[i]->nodesID.size(); k++) {
 		tmp += element.dKsi[j][k] * (grid.nodes[grid.elements[i]->nodesID[k] - 1.0]->y);
 	}
-	J.push_back(tmp);
+	J[1] = tmp;
+
 
 	tmp = 0;
 	for (int k = 0; k < grid.elements[i]->nodesID.size(); k++) {
 		tmp += element.dEta[j][k] * (grid.nodes[grid.elements[i]->nodesID[k] - 1.0]->x);
 	}
-	J.push_back(tmp);
+	J[2] = tmp;
+
 
 	tmp = 0;
 	for (int k = 0; k < grid.elements[i]->nodesID.size(); k++) {
 		tmp += element.dEta[j][k] * (grid.nodes[grid.elements[i]->nodesID[k] - 1.0]->y);
 	}
-	J.push_back(tmp);
+	J[3] = tmp;
+
 
 	double detJ = (J[0] * J[3]) - (J[1] * J[2]);
 	det = detJ;
 	detJ = 1.0 / detJ;
 
-	J_inv.push_back(detJ * J[3]);
-	J_inv.push_back(-detJ * (J[1]));
-	J_inv.push_back(-detJ * (J[2]));
-	J_inv.push_back(detJ * J[0]);
+	J_inv[0] = (detJ * J[3]);
+	J_inv[1] = (-detJ * (J[1]));
+	J_inv[2] = (-detJ * (J[2]));
+	J_inv[3] = (detJ * J[0]);
 }
 

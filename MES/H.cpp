@@ -1,6 +1,8 @@
 #include "H.h"
 #include "jakobian.h"
 
+
+
 constexpr auto CONDUCTIVITY = 25.0;
 constexpr auto ALFA = 300.0;
 
@@ -15,14 +17,15 @@ H::H(int nrElementu, Element4 element, Grid grid) {
 	Matrix* dNdy = new Matrix(n, m, 0.0);
 
 
-	for (int i = 0; i < m; i++) {
-		for (int j = 0; j < n; j++) {
-			Jakobian* jakobian = new Jakobian(nrElementu, j, element, grid);
+	//for (int i = 0; i < m; i++) {
+	//	Jakobian* jakobian = new Jakobian(nrElementu, i, element, grid);
 
-			dNdx->A[i][j] = jakobian->J_inv[0] * element.dKsi[i][j] + jakobian->J_inv[1] * element.dEta[i][j];
-			dNdy->A[i][j] = jakobian->J_inv[2] * element.dKsi[i][j] + jakobian->J_inv[3] * element.dEta[i][j];
-		}
-	}
+	//	for (int j = 0; j < n; j++) {
+
+	//		dNdx->A[i][j] = jakobian->J_inv[0] * element.dKsi[i][j] + jakobian->J_inv[1] * element.dEta[i][j];
+	//		dNdy->A[i][j] = jakobian->J_inv[2] * element.dKsi[i][j] + jakobian->J_inv[3] * element.dEta[i][j];
+	//	}
+	//}
 
 	Matrix** HH = new Matrix* [m]();
 
@@ -30,8 +33,11 @@ H::H(int nrElementu, Element4 element, Grid grid) {
 		HH[k] = new Matrix(n, m, 0.0);
 
 		for (int i = 0; i < m; i++) {
+			Jakobian* jakobian = new Jakobian(nrElementu, i, element, grid);
 			for (int j = 0; j < n; j++) {
-				Jakobian* jakobian = new Jakobian(nrElementu, j, element, grid);
+				dNdx->A[i][j] = jakobian->J_inv[0] * element.dKsi[i][j] + jakobian->J_inv[1] * element.dEta[i][j];
+				dNdy->A[i][j] = jakobian->J_inv[2] * element.dKsi[i][j] + jakobian->J_inv[3] * element.dEta[i][j];
+
 
 				double a = dNdx->A[k][i] * dNdx->A[k][j];
 
@@ -39,6 +45,7 @@ H::H(int nrElementu, Element4 element, Grid grid) {
 
 				HH[k]->A[i][j] = CONDUCTIVITY * (a + c) * jakobian->det;
 			}
+			delete jakobian;
 		}
 	}
 
@@ -147,6 +154,8 @@ Hbc::Hbc(int nrElementu, Element4 element, Grid grid)
 				HBC->A[i][j] += (ALFA * a + ALFA* c) * detJ;
 			}
 		}
+
+		delete nValue;
 	}
 	macierz = HBC;
 }
@@ -188,6 +197,7 @@ P::P(int nrElementu, Element4 element, Grid grid)
 			if (i == 2) walls.push_back(TOP);
 			if (i == 3) walls.push_back(LEFT);
 		}
+
 	}
 
 
@@ -246,6 +256,10 @@ P::P(int nrElementu, Element4 element, Grid grid)
 
 			P->A[j][0] += (ALFA * a + ALFA * c) * detJ;
 		}
+
+		delete nValue;
+		delete T;
+
 	}
 
 	macierz = P;

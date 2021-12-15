@@ -48,11 +48,15 @@ struct Element4 {
 
 
 struct Jakobian {
-	std::vector<double> J;
-	std::vector<double> J_inv;
+	double* J;
+	double* J_inv;
 
 	double det;
 
 	Jakobian(int i, int j, Element4 element, Grid grid);
+	~Jakobian() {
+		delete J;
+		delete J_inv;
+	}
 };
 

@@ -7,4 +7,7 @@ public:
 	Matrix* macierz;
 
 	C(int nrElementu, Element4 element, Grid grid);
+	~C() {
+		delete macierz;
+	}
 };
