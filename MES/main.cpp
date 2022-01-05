@@ -16,38 +16,33 @@ using namespace std::chrono;
 
 const double eps = 1e-12;
 
+//const double DELTA_T = 50.0;
 const double DELTA_T = 1.0;
-
-double fun(double x) {return 5 * x * x + 3 * x + 6;}
-
-double fun2(double x, double y) {return 5 * x * x * y * y + 3 * x * y + 6;}
-
-Funkcja* funkcja = new Funkcja(fun, "f(x) = 5x^2 + 3x + 6");
-Funkcja* funkcja2 = new Funkcja(fun2, "f(x) = 5x^2y^2 + 3xy + 6");
 
 Matrix* gauss(Matrix* A, Matrix* B);
 
-
 int main()
 {
-	Element4* element = new Element4(DWU_PUNKTOWY);
+	Element4* uniwersalnyElement = new Element4(DWU_PUNKTOWY);
 
+	//Grid* g = new Grid(0.1, 0.1, 4, 4);
 	Grid* g = new Grid(0.1, 0.1, 31, 31);
 
 	//g->homework();
 
 	const int ILOSC_WEZLOW = g->nodes.size();
 	
-	for (int iteracja = 0; iteracja < 10; iteracja++) {
+	//for (int iteracja = 0; iteracja < 10; iteracja++) {
+	for (int iteracja = 0; iteracja < 20; iteracja++) {
 		Matrix* HEX = new Matrix(ILOSC_WEZLOW, ILOSC_WEZLOW, 0.0);
 		Matrix* CEX = new Matrix(ILOSC_WEZLOW, ILOSC_WEZLOW, 0.0);
 		Matrix* PEX = new Matrix(1, ILOSC_WEZLOW, 0.0);
 
 		for (int nrElementu = 0; nrElementu < g->elements.size(); nrElementu++) {
-			H* h = new H(nrElementu, *element, *g);
-			Hbc* hbc = new Hbc(nrElementu, *element, *g);
-			P* p = new P(nrElementu, *element, *g);
-			C* c = new C(nrElementu, *element, *g);
+			H* h = new H(nrElementu, *uniwersalnyElement, *g);
+			Hbc* hbc = new Hbc(nrElementu, *uniwersalnyElement, *g);
+			P* p = new P(nrElementu, *uniwersalnyElement, *g);
+			C* c = new C(nrElementu, *uniwersalnyElement, *g);
 
 			Matrix* res = h->macierz->add(hbc->macierz);
 
@@ -81,16 +76,10 @@ int main()
 				RES->A[i][j] = HEX->A[i][j] + (CEX->A[i][j] / DELTA_T);
 			}
 
-		//RES->print();
-
-
 		Matrix* PES = new Matrix(1, ILOSC_WEZLOW, 0.0);
 
 		for (int i = 0; i < ILOSC_WEZLOW; i++)
 			for (int j = 0; j < ILOSC_WEZLOW; j++) {
-				double a = g->nodes[j]->t0;
-				double b = (CEX->A[i][j] / DELTA_T);
-				double c = HEX->A[i][j] + (CEX->A[i][j] / DELTA_T);
 				PES->A[i][0] += g->nodes[j]->t0 * (CEX->A[i][j] / DELTA_T);
 			}
 
@@ -99,14 +88,12 @@ int main()
 		}
 
 		Matrix* X = gauss(RES, PES);
-		std::cout << iteracja << " : " << X->min() << " " << X->max()<< std::endl;
+		std::cout << (iteracja + 1 ) * DELTA_T << " : " << X->min() << " " << X->max()<< std::endl;
 
 		for (int i = 0; i < ILOSC_WEZLOW; i++) {
 			double a = X->A[i][0];
 			g->nodes[i]->t0 = X->A[i][0];
 		}
-
-
 		delete HEX;
 		delete CEX;
 		delete PEX;
@@ -114,7 +101,6 @@ int main()
 		delete PES;
 		delete X;
 	}
-
 	return 0;
 }
 
