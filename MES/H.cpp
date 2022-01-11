@@ -5,54 +5,60 @@ constexpr auto CONDUCTIVITY = 25.0;
 constexpr auto ALFA = 300.0;
 
 H::H(int nrElementu, Element4 element, Grid grid) {
-	int n = element.N_FUNKCJI;
-	int m = element.indeksyPunktow.size();
+	int n_funkcji_ksztaltu = element.N_FUNKCJI;
+	int m_punktow_calkowania = element.indeksyPunktow.size();
 
-	Matrix* dNdx = new Matrix(n, m, 0.0);
-	Matrix* dNdy = new Matrix(n, m, 0.0);
-	Matrix** HH = new Matrix* [m]();
+	Matrix* dNdx = new Matrix(n_funkcji_ksztaltu, m_punktow_calkowania, 0.0);
+	Matrix* dNdy = new Matrix(n_funkcji_ksztaltu, m_punktow_calkowania, 0.0);
 
-	for (int k = 0; k < m; k++) {
-		HH[k] = new Matrix(n, n, 0.0);
+	Matrix** HPc = new Matrix* [m_punktow_calkowania]();
+
+	for (int k = 0; k < m_punktow_calkowania; k++) {
+		//tworzymy macierz HPc dla punktu calkowania
+		HPc[k] = new Matrix(n_funkcji_ksztaltu, n_funkcji_ksztaltu, 0.0);
 		//obliczamy jakobian dla ka¿dego punktu ca³kowania
 		Jakobian* jakobian = new Jakobian(nrElementu, k, element, grid);
 
+		//wyliczamy wartosci dNdx dNdY dla punktu calkowania (rz¹d)
 		for (int j = 0; j < element.N_FUNKCJI; j++) {
 			dNdx->A[k][j] = jakobian->J_inv[0] * element.dKsi[k][j] + jakobian->J_inv[1] * element.dEta[k][j];
 			dNdy->A[k][j] = jakobian->J_inv[2] * element.dKsi[k][j] + jakobian->J_inv[3] * element.dEta[k][j];
 		}
 
 		//obliczamy macierz H w poszczególnych punktach ca³kowania
+
 		for (int i = 0; i < element.N_FUNKCJI; i++) {
 			for (int j = 0; j < element.N_FUNKCJI; j++) {
-
 				double a = dNdx->A[k][i] * dNdx->A[k][j];
 				double c = dNdy->A[k][i] * dNdy->A[k][j];
+				//transponujemy w kolejnych komorkach
+				double T_komorka = a + c;
 
+				//pobieramy wagê
 				double waga = element.punktyCalkowania[element.indeksyPunktow[k]->xIndex]->A;
 				waga *= element.punktyCalkowania[element.indeksyPunktow[k]->yIndex]->A;
 
-				HH[k]->A[i][j] += CONDUCTIVITY * (a + c) * jakobian->det * waga;
+				//zapisujemy kolejne komorki HPc
+				HPc[k]->A[i][j] = CONDUCTIVITY * (T_komorka) * jakobian->det * waga;
 			}
 		}
 		delete jakobian;
 	}
 
-	//sumujemy macierze H z punktów ca³kowania
-	Matrix* H = new Matrix(n, n, 0.0);
+	//sumujemy macierze HPc z punktów ca³kowania
+	Matrix* H = new Matrix(n_funkcji_ksztaltu, n_funkcji_ksztaltu, 0.0);
 
-	for (int k = 0; k < m; k++) {
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < n; j++) {
-				H->A[i][j] += HH[k]->A[i][j];
+	for (int k = 0; k < m_punktow_calkowania; k++) {
+		for (int i = 0; i < n_funkcji_ksztaltu; i++) {
+			for (int j = 0; j < n_funkcji_ksztaltu; j++) {
+				H->A[i][j] += HPc[k]->A[i][j];
 			}
 		}
 	}
-	
 	macierz = H;
 
-	for (int i = 0; i < m; i++) delete HH[i];
-	delete HH;
+	for (int i = 0; i < m_punktow_calkowania; i++) delete HPc[i];
+	delete HPc;
 }
 
 Hbc::Hbc(int nrElementu, Element4 element, Grid grid)

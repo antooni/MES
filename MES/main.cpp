@@ -79,7 +79,7 @@ int main()
 		//PEX->print();
 
 
-
+		//lewa strona rownania
 		Matrix* RES = new Matrix(ILOSC_WEZLOW, ILOSC_WEZLOW, 0.0);
 
 		for (int i = 0; i < ILOSC_WEZLOW; i++)
@@ -88,6 +88,7 @@ int main()
 				RES->A[i][j] = HEX->A[i][j] + (CEX->A[i][j] / DELTA_T);
 			}
 
+		//prawa strona rownania
 		Matrix* PES = new Matrix(1, ILOSC_WEZLOW, 0.0);
 
 		for (int i = 0; i < ILOSC_WEZLOW; i++)
