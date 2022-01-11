@@ -113,6 +113,21 @@ Element4::Element4(Schemat _s)
 		};
 
 		punktyCalkowania = kwadratura->stopnie[0]->punkty;
+
+		punktyPoPowierzchni = {
+			new WPoint(1 / sqrt(3.0), -1,	1),
+			new WPoint(-1 / sqrt(3.0), -1,	1),
+
+			new WPoint(1, -1 / sqrt(3.0),	1),
+			new WPoint(1, 1 / sqrt(3.0),	1),
+
+			new WPoint(1 / sqrt(3.0),1,		1),
+			new WPoint(-1 / sqrt(3.0),1,	1),
+
+			new WPoint(-1,1 / sqrt(3.0),	1),
+			new WPoint(-1,-1 / sqrt(3.0),	1),
+		};
+
 	}
 	else if (_s == TRZY_PUNKTOWY) {
 		indeksyPunktow = {
@@ -131,6 +146,26 @@ Element4::Element4(Schemat _s)
 		};
 
 		punktyCalkowania = kwadratura->stopnie[1]->punkty;
+
+		punktyPoPowierzchni = {
+			new WPoint(-sqrt(3.0/5.0), -1,	5.0 / 9.0),
+			new WPoint(0, -1,				8.0 / 9.0),
+			new WPoint(sqrt(3.0 / 5.0), -1,	5.0 / 9.0),
+
+			new WPoint(1, -sqrt(3.0 / 5.0),	5.0 / 9.0),
+			new WPoint(1, 0,				8.0 / 9.0),
+			new WPoint(1, sqrt(3.0 / 5.0),	5.0 / 9.0),
+
+			new WPoint(-sqrt(3.0 / 5.0), 1,	5.0 / 9.0),
+			new WPoint(0, 1,				8.0 / 9.0),
+			new WPoint(sqrt(3.0 / 5.0), 1,	5.0 / 9.0),
+
+			new WPoint(-1,-sqrt(3.0 / 5.0),	5.0 / 9.0),
+			new WPoint(-1,0,				8.0 / 9.0),
+			new WPoint(-1,sqrt(3.0 / 5.0),	5.0 / 9.0),
+
+
+		};
 	}
 
 

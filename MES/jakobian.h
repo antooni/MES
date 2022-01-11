@@ -27,6 +27,18 @@ struct Point {
 	}
 };
 
+struct WPoint {
+	double x;
+	double y;
+	double w;
+
+	WPoint(double _x, double _y, double _w) {
+		x = _x;
+		y = _y;
+		w = _w;
+	}
+};
+
 struct Element4 {
 	std::vector<std::vector<double>> dKsi;
 	std::vector<std::vector<double>> dEta;
@@ -37,6 +49,7 @@ struct Element4 {
 
 	std::vector<PunktKwadratury*> punktyCalkowania;
 	std::vector<IndexPoint*> indeksyPunktow;
+	std::vector<WPoint*> punktyPoPowierzchni;
 
 	const int WYMIAR = 2;
 	const int N_FUNKCJI = 4;

@@ -18,6 +18,7 @@ struct H {
 struct Hbc {
 	Matrix* macierz;
 
+
 	Hbc(int nrElementu, Element4 element, Grid grid);
 	~Hbc() {
 		delete macierz;

@@ -11,7 +11,7 @@ H::H(int nrElementu, Element4 element, Grid grid) {
 	Matrix* dNdx = new Matrix(n_funkcji_ksztaltu, m_punktow_calkowania, 0.0);
 	Matrix* dNdy = new Matrix(n_funkcji_ksztaltu, m_punktow_calkowania, 0.0);
 
-	Matrix** HPc = new Matrix* [m_punktow_calkowania]();
+	Matrix** HPc = new Matrix * [m_punktow_calkowania]();
 
 	for (int k = 0; k < m_punktow_calkowania; k++) {
 		//tworzymy macierz HPc dla punktu calkowania
@@ -39,7 +39,7 @@ H::H(int nrElementu, Element4 element, Grid grid) {
 				waga *= element.punktyCalkowania[element.indeksyPunktow[k]->yIndex]->A;
 
 				//zapisujemy kolejne komorki HPc
-				HPc[k]->A[i][j] = CONDUCTIVITY * (T_komorka) * jakobian->det * waga;
+				HPc[k]->A[i][j] = CONDUCTIVITY * (T_komorka)*jakobian->det * waga;
 			}
 		}
 		delete jakobian;
@@ -63,21 +63,6 @@ H::H(int nrElementu, Element4 element, Grid grid) {
 
 Hbc::Hbc(int nrElementu, Element4 element, Grid grid)
 {
-	//wspolrzedne punktow calkowania po powierzchni
-	std::vector<Point*> punktyPoPowierzchni = {
-		new Point(1 / sqrt(3.0), -1),
-		new Point(-1 / sqrt(3.0), -1),
-
-		new Point(1, -1 / sqrt(3.0)),
-		new Point(1, 1 / sqrt(3.0)),
-
-		new Point(1 / sqrt(3.0),1),
-		new Point(-1 / sqrt(3.0),1),
-
-		new Point(-1,1 / sqrt(3.0)),
-		new Point(-1,-1 / sqrt(3.0)),
-	};
-
 	std::vector<Walls> walls;
 	//definiujemy œciany
 	for (int i = 0; i < grid.elements[nrElementu]->nodesID.size(); i++) {
@@ -104,16 +89,17 @@ Hbc::Hbc(int nrElementu, Element4 element, Grid grid)
 
 	int n = element.N.size();
 	int m = element.indeksyPunktow.size();
+	int p = sqrt(m);
 
 	Matrix* HBC = new Matrix(n, n, 0.0);
 
 	for (int nrSciany = 0; nrSciany < walls.size(); nrSciany++) {
-		Matrix* nValue = new Matrix(n, 2, 0.0);
+		Matrix* nValue = new Matrix(n, p, 0.0);
 
-		for (int i = 0; i < 2; i++) {
-			for (int j = 0; j < 4; j++) {
-				int wallOffset = 2 * walls[nrSciany];
-				nValue->A[i][j] = element.N[j](punktyPoPowierzchni[i + wallOffset]->x, punktyPoPowierzchni[i + wallOffset]->y);
+		for (int i = 0; i < p; i++) {
+			for (int j = 0; j < element.N_FUNKCJI; j++) {
+				int wallOffset = p * walls[nrSciany];
+				nValue->A[i][j] = element.N[j](element.punktyPoPowierzchni[i + wallOffset]->x, element.punktyPoPowierzchni[i + wallOffset]->y);
 			}
 		}
 		//nValue->print();
@@ -138,16 +124,18 @@ Hbc::Hbc(int nrElementu, Element4 element, Grid grid)
 		double y2 = tmpNode2->y;
 
 		double L = sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
-
 		double detJ = L / 2;
 
 		for (int i = 0; i < element.N_FUNKCJI; i++) {
 			for (int j = 0; j < element.N_FUNKCJI; j++) {
-				double a = nValue->A[0][i] * nValue->A[0][j];
+				double T_komorka = 0.0;
 
-				double c = nValue->A[1][i] * nValue->A[1][j];
+				for (int jj = 0; jj < p; jj++) {
+					int wallOffset = p * walls[nrSciany];
+					T_komorka += nValue->A[jj][i] * nValue->A[jj][j] * element.punktyPoPowierzchni[jj+wallOffset]->w;
+				}
 
-				HBC->A[i][j] += ALFA * (a + c) * detJ ;
+				HBC->A[i][j] += ALFA * T_komorka * detJ;
 			}
 		}
 
@@ -158,20 +146,6 @@ Hbc::Hbc(int nrElementu, Element4 element, Grid grid)
 
 P::P(int nrElementu, Element4 element, Grid grid)
 {
-	std::vector<Point*> punktyPoPowierzchni = {
-		new Point(1 / sqrt(3.0), -1),
-		new Point(-1 / sqrt(3.0), -1),
-
-		new Point(1, -1 / sqrt(3.0)),
-		new Point(1, 1 / sqrt(3.0)),
-
-		new Point(1 / sqrt(3.0),1),
-		new Point(-1 / sqrt(3.0),1),
-
-		new Point(-1,1 / sqrt(3.0)),
-		new Point(-1,-1 / sqrt(3.0)),
-	};
-
 	std::vector<Walls> walls;
 	for (int i = 0; i < grid.elements[nrElementu]->nodesID.size(); i++) {
 		int tmpNodeID = grid.elements[nrElementu]->nodesID[i] - 1;
@@ -199,17 +173,19 @@ P::P(int nrElementu, Element4 element, Grid grid)
 
 	int n = element.N.size();
 	int m = element.indeksyPunktow.size();
+	int p = sqrt(m);
+
 
 	Matrix* P = new Matrix( 1, 4, 0.0);
 
 	for (int nrSciany = 0; nrSciany < walls.size(); nrSciany++) {
 
-		Matrix* nValue = new Matrix(n, 2, 0.0);
+		Matrix* nValue = new Matrix(n, p, 0.0);
 
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < p; i++) {
 			for (int j = 0; j < 4; j++) {
-				int wallOffset = 2 * walls[nrSciany];
-				nValue->A[i][j] = element.N[j](punktyPoPowierzchni[i + wallOffset]->x, punktyPoPowierzchni[i + wallOffset]->y);
+				int wallOffset = p * walls[nrSciany];
+				nValue->A[i][j] = element.N[j](element.punktyPoPowierzchni[i + wallOffset]->x, element.punktyPoPowierzchni[i + wallOffset]->y);
 			}
 		}
 		//nValue->print();
@@ -246,11 +222,14 @@ P::P(int nrElementu, Element4 element, Grid grid)
 
 		for (int j = 0; j < element.N_FUNKCJI; j++) {
 
-			double a = nValue->A[0][j] * T[walls[nrSciany]];
+			double T_komorka = 0.0;
 
-			double c = nValue->A[1][j] * T[walls[nrSciany]];
+			for (int jj = 0; jj < p; jj++) {
+				int wallOffset = p * walls[nrSciany];
+				T_komorka += nValue->A[jj][j] * T[walls[nrSciany]] * element.punktyPoPowierzchni[jj + wallOffset]->w;
+			}
 
-			P->A[j][0] += ALFA * (a + c) * detJ ;
+			P->A[j][0] += ALFA * T_komorka * detJ ;
 		}
 
 		delete nValue;
