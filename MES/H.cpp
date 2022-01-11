@@ -1,73 +1,63 @@
 #include "H.h"
 #include "jakobian.h"
 
-
-
 constexpr auto CONDUCTIVITY = 25.0;
 constexpr auto ALFA = 300.0;
 
-
-
-
 H::H(int nrElementu, Element4 element, Grid grid) {
-	int n = element.dKsi.size();
+	int n = element.N_FUNKCJI;
 	int m = element.indeksyPunktow.size();
 
 	Matrix* dNdx = new Matrix(n, m, 0.0);
 	Matrix* dNdy = new Matrix(n, m, 0.0);
-
-
-	//for (int i = 0; i < m; i++) {
-	//	Jakobian* jakobian = new Jakobian(nrElementu, i, element, grid);
-
-	//	for (int j = 0; j < n; j++) {
-
-	//		dNdx->A[i][j] = jakobian->J_inv[0] * element.dKsi[i][j] + jakobian->J_inv[1] * element.dEta[i][j];
-	//		dNdy->A[i][j] = jakobian->J_inv[2] * element.dKsi[i][j] + jakobian->J_inv[3] * element.dEta[i][j];
-	//	}
-	//}
-
 	Matrix** HH = new Matrix* [m]();
 
 	for (int k = 0; k < m; k++) {
-		HH[k] = new Matrix(n, m, 0.0);
+		HH[k] = new Matrix(n, n, 0.0);
+		//obliczamy jakobian dla ka¿dego punktu ca³kowania
 		Jakobian* jakobian = new Jakobian(nrElementu, k, element, grid);
 
+		for (int j = 0; j < element.N_FUNKCJI; j++) {
+			dNdx->A[k][j] = jakobian->J_inv[0] * element.dKsi[k][j] + jakobian->J_inv[1] * element.dEta[k][j];
+			dNdy->A[k][j] = jakobian->J_inv[2] * element.dKsi[k][j] + jakobian->J_inv[3] * element.dEta[k][j];
+		}
 
-		for (int i = 0; i < m; i++) {
-			for (int j = 0; j < n; j++) {
-				dNdx->A[i][j] = jakobian->J_inv[0] * element.dKsi[i][j] + jakobian->J_inv[1] * element.dEta[i][j];
-				dNdy->A[i][j] = jakobian->J_inv[2] * element.dKsi[i][j] + jakobian->J_inv[3] * element.dEta[i][j];
-
+		//obliczamy macierz H w poszczególnych punktach ca³kowania
+		for (int i = 0; i < element.N_FUNKCJI; i++) {
+			for (int j = 0; j < element.N_FUNKCJI; j++) {
 
 				double a = dNdx->A[k][i] * dNdx->A[k][j];
-
 				double c = dNdy->A[k][i] * dNdy->A[k][j];
 
-				HH[k]->A[i][j] = CONDUCTIVITY * (a + c) * jakobian->det;
+				double waga = element.punktyCalkowania[element.indeksyPunktow[k]->xIndex]->A;
+				waga *= element.punktyCalkowania[element.indeksyPunktow[k]->yIndex]->A;
+
+				HH[k]->A[i][j] += CONDUCTIVITY * (a + c) * jakobian->det * waga;
 			}
 		}
 		delete jakobian;
-
 	}
 
-	Matrix* H = new Matrix(n, m, 0.0);
+	//sumujemy macierze H z punktów ca³kowania
+	Matrix* H = new Matrix(n, n, 0.0);
 
-	for (int i = 0; i < m; i++) {
-		for (int j = 0; j < n; j++) {
-			for (int k = 0; k < m; k++) H->A[i][j] += HH[k]->A[i][j];
+	for (int k = 0; k < m; k++) {
+		for (int i = 0; i < n; i++) {
+			for (int j = 0; j < n; j++) {
+				H->A[i][j] += HH[k]->A[i][j];
+			}
 		}
 	}
-
-
-	//H->print();
+	
 	macierz = H;
 
+	for (int i = 0; i < m; i++) delete HH[i];
+	delete HH;
 }
 
 Hbc::Hbc(int nrElementu, Element4 element, Grid grid)
 {
-
+	//wspolrzedne punktow calkowania po powierzchni
 	std::vector<Point*> punktyPoPowierzchni = {
 		new Point(1 / sqrt(3.0), -1),
 		new Point(-1 / sqrt(3.0), -1),
@@ -83,6 +73,7 @@ Hbc::Hbc(int nrElementu, Element4 element, Grid grid)
 	};
 
 	std::vector<Walls> walls;
+	//definiujemy œciany
 	for (int i = 0; i < grid.elements[nrElementu]->nodesID.size(); i++) {
 		int tmpNodeID = grid.elements[nrElementu]->nodesID[i] - 1;
 		int tmpNodeID2;
@@ -97,7 +88,6 @@ Hbc::Hbc(int nrElementu, Element4 element, Grid grid)
 		}
 		Node* tmpNode2 = grid.nodes[tmpNodeID2];
 
-		//works only for 2d
 		if(tmpNode->isBC && tmpNode2->isBC) {
 			if (i == 0) walls.push_back(BOTTOM);
 			if (i == 1) walls.push_back(RIGHT);
@@ -106,14 +96,12 @@ Hbc::Hbc(int nrElementu, Element4 element, Grid grid)
 		}
 	}
 
-
 	int n = element.N.size();
 	int m = element.indeksyPunktow.size();
 
-	Matrix* HBC = new Matrix(n, m, 0.0);
+	Matrix* HBC = new Matrix(n, n, 0.0);
 
 	for (int nrSciany = 0; nrSciany < walls.size(); nrSciany++) {
-
 		Matrix* nValue = new Matrix(n, 2, 0.0);
 
 		for (int i = 0; i < 2; i++) {
@@ -147,13 +135,13 @@ Hbc::Hbc(int nrElementu, Element4 element, Grid grid)
 
 		double detJ = L / 2;
 
-		for (int i = 0; i < 4; i++) {
-			for (int j = 0; j < 4; j++) {
+		for (int i = 0; i < element.N_FUNKCJI; i++) {
+			for (int j = 0; j < element.N_FUNKCJI; j++) {
 				double a = nValue->A[0][i] * nValue->A[0][j];
 
 				double c = nValue->A[1][i] * nValue->A[1][j];
 
-				HBC->A[i][j] += (ALFA * a + ALFA* c) * detJ;
+				HBC->A[i][j] += ALFA * (a + c) * detJ ;
 			}
 		}
 
@@ -250,13 +238,13 @@ P::P(int nrElementu, Element4 element, Grid grid)
 		T[TOP] = 1200.0;
 		T[LEFT] = 1200.0;
 
-		for (int j = 0; j < 4; j++) {
+		for (int j = 0; j < element.N_FUNKCJI; j++) {
 
 			double a = nValue->A[0][j] * T[walls[nrSciany]];
 
 			double c = nValue->A[1][j] * T[walls[nrSciany]];
 
-			P->A[j][0] += (ALFA * a + ALFA * c) * detJ;
+			P->A[j][0] += ALFA * (a + c) * detJ ;
 		}
 
 		delete nValue;

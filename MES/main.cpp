@@ -1,7 +1,6 @@
 #include <iostream>
 #include <chrono>
 
-
 #include "grid.h"
 #include "kwadratury.h"
 #include "calka.h"
@@ -11,9 +10,9 @@
 #include "H.h"
 #include "C.h"
 
+//paraview, pliki txt
+
 using namespace std::chrono;
-
-
 const double eps = 1e-12;
 
 //const double DELTA_T = 50.0;
@@ -23,17 +22,18 @@ Matrix* gauss(Matrix* A, Matrix* B);
 
 int main()
 {
-	Element4* uniwersalnyElement = new Element4(DWU_PUNKTOWY);
+	Element4* uniwersalnyElement = new Element4(TRZY_PUNKTOWY);
 
 	//Grid* g = new Grid(0.1, 0.1, 4, 4);
 	Grid* g = new Grid(0.1, 0.1, 31, 31);
+	//Grid* g = new Grid(0.25, 0.25, 2, 2);
 
 	//g->homework();
 
 	const int ILOSC_WEZLOW = g->nodes.size();
 	
 	//for (int iteracja = 0; iteracja < 10; iteracja++) {
-	for (int iteracja = 0; iteracja < 20; iteracja++) {
+	for (int iteracja = 0; iteracja < 3; iteracja++) {
 		Matrix* HEX = new Matrix(ILOSC_WEZLOW, ILOSC_WEZLOW, 0.0);
 		Matrix* CEX = new Matrix(ILOSC_WEZLOW, ILOSC_WEZLOW, 0.0);
 		Matrix* PEX = new Matrix(1, ILOSC_WEZLOW, 0.0);
@@ -43,6 +43,13 @@ int main()
 			Hbc* hbc = new Hbc(nrElementu, *uniwersalnyElement, *g);
 			P* p = new P(nrElementu, *uniwersalnyElement, *g);
 			C* c = new C(nrElementu, *uniwersalnyElement, *g);
+
+			//h->macierz->print();
+			//hbc->macierz->print();
+			//p->macierz->print();
+			//c->macierz->print();
+
+			//c->macierz->print();
 
 			Matrix* res = h->macierz->add(hbc->macierz);
 
@@ -67,6 +74,11 @@ int main()
 			delete p;
 			delete c;
 		}
+		//HEX->print();
+		//CEX->print();
+		//PEX->print();
+
+
 
 		Matrix* RES = new Matrix(ILOSC_WEZLOW, ILOSC_WEZLOW, 0.0);
 

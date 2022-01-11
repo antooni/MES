@@ -76,8 +76,10 @@ void Element4::wyswietlDEta()
 	std::cout << std::endl;
 }
 
-Element4::Element4(Schemat s)
+Element4::Element4(Schemat _s)
 {
+	s = _s;
+
 	pochodneKsi = {
 		pKsi_1,
 		pKsi_2,
@@ -101,9 +103,8 @@ Element4::Element4(Schemat s)
 
 	kwadratura = new Kwadratura();
 
-	std::vector<PunktKwadratury*> punktyCalkowania;
 
-	if (s == DWU_PUNKTOWY) {
+	if (_s == DWU_PUNKTOWY) {
 		indeksyPunktow = {
 			new IndexPoint(0,0),
 			new IndexPoint(1,0),
@@ -113,18 +114,19 @@ Element4::Element4(Schemat s)
 
 		punktyCalkowania = kwadratura->stopnie[0]->punkty;
 	}
-	else if (s == TRZY_PUNKTOWY) {
+	else if (_s == TRZY_PUNKTOWY) {
 		indeksyPunktow = {
 			new IndexPoint(0,0),
-			new IndexPoint(0,1),
-			new IndexPoint(0,2),
-
 			new IndexPoint(1,0),
-			new IndexPoint(1,1),
-			new IndexPoint(1,2),
-
 			new IndexPoint(2,0),
+
+
+			new IndexPoint(0,1),
+			new IndexPoint(1,1),
 			new IndexPoint(2,1),
+
+			new IndexPoint(0,2),
+			new IndexPoint(1,2),
 			new IndexPoint(2,2),
 		};
 

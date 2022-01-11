@@ -35,9 +35,15 @@ struct Element4 {
 	std::vector<double(*)(double)> pochodneEta;
 	std::vector<double(*)(double, double)> N;
 
+	std::vector<PunktKwadratury*> punktyCalkowania;
 	std::vector<IndexPoint*> indeksyPunktow;
 
+	const int WYMIAR = 2;
+	const int N_FUNKCJI = 4;
+
 	Kwadratura* kwadratura;
+
+	Schemat s;
 
 	Element4(Schemat s);
 
